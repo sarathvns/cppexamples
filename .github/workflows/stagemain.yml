@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cpp-job:
     runs-on: ubuntu-latest
     container: ubuntu:latest
 
