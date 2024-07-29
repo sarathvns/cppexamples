@@ -11,6 +11,9 @@ APPS := $(notdir $(APP_DIRS))
 # Find all test directories
 TEST_DIRS := $(wildcard tests/*)
 
+# Generate include paths for all app directories
+APP_INCLUDE_PATHS := $(addprefix -I,$(APP_DIRS))
+
 # Default target to build all apps and tests
 all: $(APPS) tests
 
@@ -24,7 +27,7 @@ tests: $(TEST_DIRS)
 
 $(TEST_DIRS):
 	@echo "Building and running tests for $@..."
-	$(CXX) $(CXXFLAGS) -Iapps/sumofnumbers -o $@/run_tests $@/*.cpp $(TEST_FLAGS)
+	$(CXX) $(CXXFLAGS) $(APP_INCLUDE_PATHS) -o $@/run_tests $@/*.cpp $(TEST_FLAGS)
 	$@/run_tests
 
 # Clean all apps and tests
