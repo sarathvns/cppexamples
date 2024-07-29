@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  cpp-job:
+    runs-on: ubuntu-latest
+    container: ubuntu:latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y g++ make clang-tidy libgtest-dev cmake
+
+    - name: Build and install Google Test
+      run: |
+        cd /usr/src/googletest
+        cmake -DCMAKE_CXX_STANDARD=14 .
+        make
+        cp lib/*.a /usr/lib
+        cp -r googletest/include/gtest /usr/include
+        cp -r googlemock/include/gmock /usr/include
+
+    - name: Sanity
+      run: |
+        for app in apps/*; do
+          if [ -d "$app" ]; then
+            echo "Linting $app"
+            clang-tidy $app/*.cpp -- -std=c++14
+          fi
+        done
+
+    - name: Build
+      run: make
+
+    - name: Test
+      run: make tests
+
+    - name: Run app
+      run: |
+        for app in apps/*; do
+          if [ -d "$app" ]; then
+            app_name=$(basename "$app")
+            echo "Running $app_name"
+            ./$app/$app_name
+          fi
+        done
+
+    - name: Clean
+      run: make clean
