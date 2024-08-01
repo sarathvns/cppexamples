@@ -1,5 +1,5 @@
-// test/test_prime.cpp
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "prime.h"
 
 // Test case for checking if the number is prime
